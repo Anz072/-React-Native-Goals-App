@@ -1,0 +1,16 @@
+export const imgs = [
+  require("./img/g1.gif"),
+  require("./img/g2.gif"),
+  require("./img/g3.gif"),
+  require("./img/g4.gif"),
+  require("./img/g5.gif"),
+  require("./img/g6.gif"),
+  require("./img/g7.gif"),
+  require("./img/g8.gif"),
+  require("./img/g9.gif"),
+  require("./img/g10.gif"),
+  require("./img/g11.gif"),
+  require("./img/g12.gif"),
+  require("./img/g13.gif"),
+  require("./img/g14.gif"),
+];
