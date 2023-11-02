@@ -1,77 +1,52 @@
 import { useState } from "react";
-import { imgs } from './imgList';
+import { imgs } from "./imgList";
+import { v4 as uuidv4 } from 'uuid';
 import {
   StyleSheet,
-  Text,
   View,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  ScrollView,
+  FlatList,
 } from "react-native";
 
+import GoalItem from "./components/goalItem";
+import GoalInput from "./components/goalInput";
+
 export default function App() {
-  const [enteredGoalText, setEnteredGoalText] = useState("");
   const [courseGoals, setCourseGoals] = useState([]);
 
-  function goalInputHandler(enteredText) {
-    setEnteredGoalText(enteredText);
-  }
-
-  function addGoalHandler() {
+  function addGoalHandler(enteredGoalText) {
     if (enteredGoalText !== "") {
-      let imgSrc = randomImgSeed();
-      console.log(imgSrc)
       let goal = {
         text: enteredGoalText,
-        uri: imgSrc 
-      }
-      setCourseGoals((currentCourseGoals) => [
-        ...currentCourseGoals,
-        goal,
-      ]);
-      setEnteredGoalText(""); // Clear input after adding goal
-      
+        uri: randomImgSeed(),
+        id: uuidv4()
+      };
+      setCourseGoals((currentCourseGoals) => [...currentCourseGoals, goal]);
     }
   }
 
-  function randomImgSeed(){
+  function randomImgSeed() {
     let int = Math.floor(Math.random() * (14 - 1) + 1);
-    return imgs[int]
+    return imgs[int];
+  }
+
+  function deleteGoalHandler(id){
+    setCourseGoals(currentCourseGoals => {
+      return currentCourseGoals.filter((goal) => goal.id !== id)
+    })
   }
 
   return (
     <View style={styles.AppContainer}>
       <View style={styles.mainContainer}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.titleText}>New Year's goals</Text>
-          <Text style={styles.subtitleText}>
-            Make a list of goals you're never going to work towards!
-          </Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Your course goal!"
-            onChangeText={goalInputHandler}
-            value={enteredGoalText} // Control the input value
-          />
-          <TouchableOpacity style={styles.buttonStyle} onPress={addGoalHandler}>
-            <Text style={styles.buttonText}>Add Goal</Text>
-          </TouchableOpacity>
-        </View>
+        <GoalInput onAddGoal={addGoalHandler} />
         <View style={styles.scrollViewStyleContainer}>
-          <ScrollView contentContainerStyle={styles.scrollViewStyle}>
-            {courseGoals.map((goal, index) => (
-              <View  key={index} style={styles.goalItemMain}>
-                <Text style={styles.goalItemText}>
-                  {goal.text}
-                </Text>
-                <Image
-                  source={goal.uri}
-                  style={styles.goalItemImage}
-                />
-              </View>
-            ))}
-          </ScrollView>
+          <FlatList
+            contentContainerStyle={styles.scrollViewStyle}
+            data={courseGoals}
+            renderItem={(itemData) => {
+              return <GoalItem text={itemData.item.text} uri={itemData.item.uri} indexKey={itemData.item.id} onDelete={deleteGoalHandler}/>
+            }}
+          ></FlatList>
         </View>
       </View>
     </View>
@@ -90,70 +65,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
     height: "100%",
   },
-  inputContainer: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  textInput: {
-    margin: 15,
-    borderWidth: 1,
-    borderRadius: 10,
-    fontSize: 16,
-    width: "95%",
-    height: 65,
-    borderColor: "#00000052",
-    paddingHorizontal: 10, // Add padding inside the input
-  },
-  titleText: {
-    fontSize: 42,
-    fontWeight: "bold", // Updated fontWeight to a string
-    textAlign: "center",
-    width: "100%",
-    color: "#222222",
-  },
-  buttonStyle: {
-    backgroundColor: "#4CAF50",
-    width: 245,
-    height: 60,
-    borderRadius: 50,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonText: {
-    fontSize: 18,
-    color: "#fff",
-    fontWeight: "600",
-  },
-  goalItemMain: {
-    backgroundColor: "#eeeeee",
-    borderRadius: 4,
-    width: "95%",
-    height: 80,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 5,
-    paddingLeft: 15,
-    paddingRight: 15,
-    margin: 3,
-  },
-  goalItemText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#222222",
-  },
   scrollViewStyle: {
-    alignItems: "center",
+    flexDirection: "column",
+    alignItems: 'center',
+    margin: 3,
   },
   scrollViewStyleContainer: {
     marginTop: 20,
     marginBottom: 5,
     flex: 1,
   },
-  goalItemImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 12,
-    overlayColor: "#eeeeee",
-  },
+
 });
